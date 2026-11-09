@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>আবেদন করুন — Contentbuzz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="apply">
+  <header id="site-header"></header>
+
+  <main>
+    <section class="page-hero center" style="padding-bottom:50px">
+      <div class="container">
+        <span class="eyebrow">আবেদন</span>
+        <h1 style="margin:0 auto">স্কেল করতে প্রস্তুত?</h1>
+        <p class="lead" style="margin-top:20px">২ মিনিটের ফর্ম। আমাদের টিম ২৪–৪৮ ঘণ্টার মধ্যে কল করবে।</p>
+      </div>
+    </section>
+
+    <section style="padding-bottom:110px">
+      <div class="container form-wrap">
+        <form class="form-card" id="apply-form" novalidate>
+          <div class="form-step-label">০১ · আপনার তথ্য</div>
+          <div class="field-row">
+            <div class="field"><label for="name">নাম *</label><input id="name" name="name" required autocomplete="name"></div>
+            <div class="field"><label for="phone">ফোন / হোয়াটসঅ্যাপ *</label><input id="phone" name="phone" type="tel" required autocomplete="tel" placeholder="01XXXXXXXXX"></div>
+          </div>
+          <div class="field"><label for="email">ইমেইল</label><input id="email" name="email" type="email" autocomplete="email"></div>
+
+          <div class="form-step-label" style="margin-top:30px">০২ · আপনার ব্যবসা</div>
+          <div class="field">
+            <label for="program">কোন প্রোগ্রামে আগ্রহী? *</label>
+            <select id="program" name="program" required></select>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="business">ব্যবসার নাম / ধরন *</label><input id="business" name="business" required placeholder="যেমন: অনলাইন ফ্যাশন পেজ"></div>
+            <div class="field">
+              <label for="stage">ব্যবসা এখন কোন ধাপে? *</label>
+              <select id="stage" name="stage" required>
+                <option value="">বেছে নিন</option>
+                <option>আইডিয়া — এখনো শুরু করিনি</option>
+                <option>শুরু করেছি (০–১ বছর)</option>
+                <option>চলছে, কিন্তু গ্রোথ আটকে আছে</option>
+                <option>ভালো চলছে, স্কেল করতে চাই</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="revenue">মাসিক আয় (আনুমানিক) <span class="hint">— ঐচ্ছিক</span></label>
+            <select id="revenue" name="revenue">
+              <option value="">বলতে চাই না</option>
+              <option>এখনো আয় নেই</option>
+              <option>১ লাখ টাকার নিচে</option>
+              <option>১–৫ লাখ টাকা</option>
+              <option>৫–২০ লাখ টাকা</option>
+              <option>২০ লাখ টাকার বেশি</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="goal">পরের ৯০ দিনে কী অর্জন করতে চান? *</label>
+            <textarea id="goal" name="goal" required></textarea>
+          </div>
+          <div class="field">
+            <label for="calltime">কখন কল করলে সুবিধা?</label>
+            <select id="calltime" name="calltime">
+              <option>যেকোনো সময়</option><option>সকাল (১০–১২)</option><option>দুপুর (১২–৪)</option><option>সন্ধ্যা (৪–৮)</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" type="submit" style="width:100%;margin-top:10px">আবেদন জমা দিন</button>
+          <div class="form-msg" id="form-msg" role="status"></div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script>
+    // Program dropdown from config (all services; soon ones go to waitlist)
+    const sel = document.getElementById("program");
+    const wanted = new URLSearchParams(location.search).get("program") || "academy";
+    sel.innerHTML = CB.services
+      .map((s) => `<option value="${s.id}" ${s.id === wanted ? "selected" : ""}>${s.bn}${s.status === "soon" ? " (ওয়েটলিস্ট)" : ""}</option>`)
+      .join("");
+
+    const form = document.getElementById("apply-form");
+    const msg = document.getElementById("form-msg");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.className = "form-msg";
+      const required = [...form.querySelectorAll("[required]")];
+      const missing = required.filter((el) => !el.value.trim());
+      required.forEach((el) => (el.style.borderColor = missing.includes(el) ? "#c0392b" : ""));
+      if (missing.length) { msg.className = "form-msg err"; msg.textContent = "তারকা (*) চিহ্নিত ঘরগুলো পূরণ করুন।"; missing[0].focus(); return; }
+      if (!/^(\+?88)?01[3-9]\d{8}$/.test(form.phone.value.replace(/[\s-]/g, ""))) {
+        msg.className = "form-msg err"; msg.textContent = "সঠিক বাংলাদেশি মোবাইল নম্বর দিন (01XXXXXXXXX)।"; form.phone.focus(); return;
+      }
+      const data = Object.fromEntries(new FormData(form).entries());
+      data.type = "application";
+      data.submittedAt = new Date().toISOString();
+      const btn = form.querySelector("button");
+      btn.disabled = true; btn.textContent = "পাঠানো হচ্ছে…";
+      try {
+        const how = await CB.submitLead(data);
+        msg.className = "form-msg ok";
+        msg.textContent = how === "demo"
+          ? "ধন্যবাদ! (ডেমো মোড: config.js-এ formEndpoint বা whatsapp সেট না করা পর্যন্ত আবেদন কোথাও জমা হবে না।)"
+          : "ধন্যবাদ! আপনার আবেদন পেয়েছি। ২৪–৪৮ ঘণ্টার মধ্যে আমাদের টিম কল করবে।";
+        form.reset();
+      } catch (err) {
+        msg.className = "form-msg err"; msg.textContent = "জমা দেওয়া যায়নি। একটু পরে আবার চেষ্টা করুন।";
+      }
+      btn.disabled = false; btn.textContent = "আবেদন জমা দিন";
+    });
+  </script>
+</body>
+</html>

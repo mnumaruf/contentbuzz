@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ফ্রি গ্রোথ রোডম্যাপ — Contentbuzz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="roadmap">
+  <header id="site-header"></header>
+
+  <main>
+    <section class="page-hero center" style="padding-bottom:50px">
+      <div class="container">
+        <span class="eyebrow">ফ্রি গ্রোথ রোডম্যাপ</span>
+        <h1 style="margin:0 auto">আপনার ব্যবসা এখন কোথায়?</h1>
+        <p class="lead" style="margin-top:20px">৬টা প্রশ্ন, ২ মিনিট। শেষে পাবেন আপনার ধাপ আর পরের ৯০ দিনের ফোকাস।</p>
+      </div>
+    </section>
+
+    <section style="padding-bottom:110px">
+      <div class="container form-wrap">
+        <div class="form-card" id="quiz"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script>
+    // Each option gives points (0-3). Total decides the stage.
+    const QUESTIONS = [
+      { q: "আপনার ব্যবসা এখন কোন অবস্থায়?", o: ["শুধু আইডিয়া", "শুরু করেছি, বিক্রি অল্প", "নিয়মিত বিক্রি হচ্ছে", "ভালো চলছে, টিম আছে"] },
+      { q: "নিয়মিত কনটেন্ট পোস্ট করেন?", o: ["না", "মাঝে মাঝে", "সপ্তাহে কয়েকবার", "প্ল্যান করে প্রতিদিন"] },
+      { q: "পেইড অ্যাড (মেটা) চালান?", o: ["কখনো না", "বুস্ট করি শুধু", "ক্যাম্পেইন চালাই, ফল মিশ্র", "লাভজনকভাবে চালাই"] },
+      { q: "কাস্টমার কোথা থেকে আসে?", o: ["এখনো আসে না", "পরিচিতদের থেকে", "সোশ্যাল মিডিয়া থেকে", "একাধিক নির্ভরযোগ্য চ্যানেল"] },
+      { q: "ইনবক্স/অর্ডার কে সামলায়?", o: ["কেউ না / এখনো দরকার নেই", "আমি নিজেই সব", "১ জন সাহায্য করে", "টিম + লেখা প্রসেস আছে"] },
+      { q: "সবচেয়ে বড় বাধা কোনটা?", o: ["কোথা থেকে শুরু করব জানি না", "কনটেন্ট আর অ্যাড বুঝি না", "বিক্রি বাড়ছে না", "সব আমাকে করতে হয়, সময় নেই"], key: "obstacle" }
+    ];
+    const STAGES = [
+      { max: 5, name: "ফাউন্ডেশন", text: "আগে অফার, কাস্টমার আর প্রথম বিক্রির সিস্টেম দাঁড় করান। এই ধাপে সবচেয়ে বেশি কাজে দেবে কাঠামোবদ্ধ, হাতে-কলমে শেখা।", focus: ["অফার ও টার্গেট কাস্টমার পরিষ্কার করা", "সপ্তাহে ৩টা কনটেন্ট নিয়মিত", "প্রথম ১০ জন কাস্টমার"] },
+      { max: 10, name: "ট্র্যাকশন", text: "ব্যবসা চলছে, কিন্তু গ্রোথ অনিয়মিত। কনটেন্ট আর অ্যাড একটা সিস্টেমে আনলে পরের লাফটা আসবে।", focus: ["৩০ দিনের কনটেন্ট প্ল্যান", "মেটা অ্যাড ক্যাম্পেইন স্ট্রাকচার", "ল্যান্ডিং পেজ / ফানেল"] },
+      { max: 14, name: "গ্রোথ", text: "আপনার ভিত্তি আছে। এখন দরকার অ্যাড স্কেলিং, কনভার্সন আর সেলস প্রসেস শক্ত করা।", focus: ["লাভজনক অ্যাড স্কেল করা", "সেলস ও ফলো-আপ স্ক্রিপ্ট", "নাম্বার দেখে সিদ্ধান্ত"] },
+      { max: 99, name: "স্কেল", text: "আপনি ভালো জায়গায় আছেন। পরের ধাপ হলো নিজেকে প্রতিদিনের কাজ থেকে সরিয়ে সিস্টেম আর টিম দিয়ে চালানো।", focus: ["SOP ও টিম সিস্টেম", "কাজ ডেলিগেট করা", "নতুন চ্যানেল যোগ করা"] }
+    ];
+
+    const box = document.getElementById("quiz");
+    const answers = [];
+    let i = 0;
+
+    function renderQ() {
+      const Q = QUESTIONS[i];
+      box.innerHTML = `
+        <div class="quiz-progress"><div style="width:${(i / QUESTIONS.length) * 100}%"></div></div>
+        <div class="quiz-count">প্রশ্ন ${i + 1} / ${QUESTIONS.length}</div>
+        <div class="quiz-q">${Q.q}</div>
+        <div class="quiz-opts">${Q.o.map((o, k) => `<button class="quiz-opt" data-k="${k}">${o}</button>`).join("")}</div>
+        ${i > 0 ? '<button class="btn btn-ghost" id="back" style="margin-top:24px;padding:12px 22px;font-size:13px">← আগের প্রশ্ন</button>' : ""}`;
+      box.querySelectorAll(".quiz-opt").forEach((b) => b.addEventListener("click", () => {
+        answers[i] = +b.dataset.k;
+        i++;
+        i < QUESTIONS.length ? renderQ() : renderLead();
+      }));
+      const back = document.getElementById("back");
+      if (back) back.addEventListener("click", () => { i--; renderQ(); });
+    }
+
+    function result() {
+      const score = answers.slice(0, 5).reduce((a, b) => a + b, 0); // last question is obstacle, not scored
+      return STAGES.find((s) => score <= s.max);
+    }
+
+    function renderLead() {
+      box.innerHTML = `
+        <div class="quiz-progress"><div style="width:100%"></div></div>
+        <div class="quiz-q">আপনার রোডম্যাপ তৈরি!</div>
+        <p class="muted" style="margin:-10px 0 26px">কোথায় পাঠাব? রেজাল্ট এখনই দেখাবে, আর বিস্তারিত রোডম্যাপ আমাদের টিম পাঠাবে।</p>
+        <form id="lead" novalidate>
+          <div class="field"><label for="name">নাম *</label><input id="name" required></div>
+          <div class="field"><label for="phone">ফোন / হোয়াটসঅ্যাপ *</label><input id="phone" type="tel" required placeholder="01XXXXXXXXX"></div>
+          <button class="btn btn-primary" style="width:100%">রেজাল্ট দেখুন</button>
+          <div class="form-msg" id="form-msg"></div>
+        </form>`;
+      document.getElementById("lead").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("name").value.trim();
+        const phone = document.getElementById("phone").value.replace(/[\s-]/g, "");
+        const msg = document.getElementById("form-msg");
+        if (!name || !/^(\+?88)?01[3-9]\d{8}$/.test(phone)) { msg.className = "form-msg err"; msg.textContent = "নাম আর সঠিক মোবাইল নম্বর দিন।"; return; }
+        const r = result();
+        const data = {
+          type: "roadmap", name, phone, stage: r.name,
+          obstacle: QUESTIONS[5].o[answers[5]],
+          answers: QUESTIONS.map((q, k) => q.o[answers[k]]).join(" | "),
+          submittedAt: new Date().toISOString()
+        };
+        try { await CB.submitLead(data); } catch (err) { /* still show result */ }
+        renderResult(r, name.replace(/[&<>"']/g, ""));
+      });
+    }
+
+    function renderResult(r, name) {
+      box.innerHTML = `
+        <span class="eyebrow">${name}, আপনার ধাপ</span>
+        <div class="quiz-q" style="font-size:44px;margin-bottom:14px"><span class="gold">${r.name}</span></div>
+        <p class="lead">${r.text}</p>
+        <div class="form-step-label" style="margin-top:34px">পরের ৯০ দিনের ফোকাস</div>
+        <ul class="check-list" style="margin-top:0">${r.focus.map((f) => `<li>${f}</li>`).join("")}</ul>
+        <div class="card" style="margin-top:34px;background:var(--bg-soft)">
+          <h3>প্রস্তাবিত পরের ধাপ: Business Academy</h3>
+          <p>৮টি লাইভ ক্লাসে এই ফোকাসগুলো নিজের ব্যবসায় হাতে-কলমে বাস্তবায়ন করুন।</p>
+          <div class="btn-row" style="margin-top:20px">
+            <a class="btn btn-primary" href="apply.html?program=academy">I'm Ready to Scale</a>
+            <a class="btn btn-ghost" href="academy.html">একাডেমি দেখুন</a>
+          </div>
+        </div>`;
+    }
+
+    renderQ();
+  </script>
+</body>
+</html>

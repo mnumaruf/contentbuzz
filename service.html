@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>শীঘ্রই আসছে — Contentbuzz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <!-- এই পেজটা "soon" স্ট্যাটাসের সব সার্ভিসের জন্য। সার্ভিস চালু হলে তার নিজের পেজ (যেমন agency.html) বানিয়ে config.js-এ url দিন। -->
+  <header id="site-header"></header>
+
+  <main>
+    <section class="page-hero center">
+      <div class="container">
+        <span class="tag tag-soon">শীঘ্রই আসছে</span>
+        <h1 id="svc-title" style="margin:0 auto"></h1>
+        <p class="lead" id="svc-summary" style="margin-top:22px"></p>
+      </div>
+    </section>
+
+    <section style="padding-bottom:110px">
+      <div class="container form-wrap">
+        <form class="form-card" id="waitlist-form" novalidate>
+          <h3>ওয়েটলিস্টে যোগ দিন</h3>
+          <p class="muted" style="margin:8px 0 26px">চালু হওয়ার সাথে সাথে আপনাকে সবার আগে জানাব।</p>
+          <div class="field-row">
+            <div class="field"><label for="name">নাম *</label><input id="name" name="name" required></div>
+            <div class="field"><label for="phone">ফোন / হোয়াটসঅ্যাপ *</label><input id="phone" name="phone" type="tel" required placeholder="01XXXXXXXXX"></div>
+          </div>
+          <button class="btn btn-primary" type="submit" style="width:100%">ওয়েটলিস্টে যোগ দিন</button>
+          <div class="form-msg" id="form-msg" role="status"></div>
+        </form>
+        <div class="card center" style="margin-top:24px">
+          <h3>এখনই শুরু করতে চান?</h3>
+          <p>Business Academy-তে এখন ভর্তি চলছে।</p>
+          <div class="btn-row" style="justify-content:center;margin-top:20px"><a class="btn btn-ghost" href="academy.html">একাডেমি দেখুন</a></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script>
+    // set active nav before main.js renders header
+    window.__svcId = new URLSearchParams(location.search).get("id") || "";
+    document.body.dataset.page = window.__svcId;
+  </script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script>
+    const svc = CB.services.find((s) => s.id === window.__svcId);
+    if (!svc) { location.replace("index.html"); }
+    else if (svc.status === "live" && svc.url) { location.replace(svc.url); }
+    else {
+      document.title = svc.bn + " — শীঘ্রই আসছে | Contentbuzz";
+      document.getElementById("svc-title").textContent = svc.bn;
+      document.getElementById("svc-summary").textContent = svc.summary;
+    }
+
+    const form = document.getElementById("waitlist-form");
+    const msg = document.getElementById("form-msg");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const phone = form.phone.value.replace(/[\s-]/g, "");
+      if (!form.name.value.trim() || !/^(\+?88)?01[3-9]\d{8}$/.test(phone)) {
+        msg.className = "form-msg err"; msg.textContent = "নাম আর সঠিক মোবাইল নম্বর দিন।"; return;
+      }
+      const data = { type: "waitlist", service: svc ? svc.id : "", name: form.name.value.trim(), phone, submittedAt: new Date().toISOString() };
+      try {
+        const how = await CB.submitLead(data);
+        msg.className = "form-msg ok";
+        msg.textContent = how === "demo" ? "ধন্যবাদ! (ডেমো মোড: config.js-এ formEndpoint সেট করতে হবে।)" : "ধন্যবাদ! চালু হলেই জানাব।";
+        form.reset();
+      } catch { msg.className = "form-msg err"; msg.textContent = "জমা দেওয়া যায়নি, আবার চেষ্টা করুন।"; }
+    });
+  </script>
+</body>
+</html>
